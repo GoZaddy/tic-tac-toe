@@ -1,5 +1,5 @@
 <template>
-  <div style="width:90%;max-width:500px">
+  <div style="width:95%;max-width:500px">
 <!--    -->
     <div class="my-2" v-if="!newGameClicked">
       <button
