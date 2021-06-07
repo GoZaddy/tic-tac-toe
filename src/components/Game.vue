@@ -1,5 +1,5 @@
 <template>
-  <div style="width:95%;max-width:500px">
+  <div style="width:95%;max-width:400px">
 <!--    -->
     <div class="my-2" v-if="!newGameClicked">
       <button
@@ -104,29 +104,53 @@ export default {
 
     onMovePlayed(data){
       this.moves.push(data)
-      console.log('move recorded')
-      const player = data.split('-')[0]
-      if(player === 'x'){
-        this.currentTurn = 'o'
-      } else {
-        this.currentTurn = 'x'
+      const gameState = this.board.evaluateGameState();
+      console.log('gameState', gameState)
+
+      //just checking if there are open cells
+      if(gameState !== Number.POSITIVE_INFINITY && gameState !== Number.NEGATIVE_INFINITY){
+        if (!this.board.hasOpenCell()){
+          console.log('bullshit')
+          this.gameState = 'done'
+        } else {
+            const player = data.split('-')[0]
+            if(player === 'x'){
+              this.currentTurn = 'o'
+            }
+            else {
+              this.currentTurn = 'x'
+            }
+        }
+
       }
-      console.log(this.moves)
+      else {
+        const player = data.split('-')[0]
+        if(player === 'x'){
+          this.currentTurn = 'o'
+        }
+        else {
+          this.currentTurn = 'x'
+        }
+      }
+      console.log('move recorded')
+
+
     }
   },
   watch: {
     currentTurn(){
       if(this.currentTurn === this.players['computer']){
+        console.log('computer playing')
         //simulate wait time for computer to make decision
         setTimeout(() => {
           try{
-            const {move, hasNoOpenCell} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 4, {});
+            const {move} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 4, {});
             this.board.occupyCell(this.players['computer'], move)
             this.moves.push(this.players.computer+ '-'+move);
-            const gameState = this.board.evaluateGameState()
+            const gameState = this.board.evaluateGameState();
             console.log('gameState', gameState)
             if(gameState !== Number.POSITIVE_INFINITY && gameState !== Number.NEGATIVE_INFINITY){
-              if (hasNoOpenCell){
+              if (!this.board.hasOpenCell()){
                 console.log('bullshit')
                 this.gameState = 'done'
               } else {

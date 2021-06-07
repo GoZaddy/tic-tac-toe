@@ -1,5 +1,5 @@
 <template>
-  <div class="p-10 bg-blue-400">
+  <div class="p-5 sm:p-10 bg-blue-400">
     <div class="grid-container bg-blue-400">
       <Cell
           class="hover:bg-blue-600 w-full h-full border border-gray-200 cursor-pointer"

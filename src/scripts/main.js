@@ -155,18 +155,18 @@ class Board {
         // console.log('x score: ', XScore)
         return XScore +OScore;
     }
-}
 
-let b = new Board();
-b.occupyCell('x', 'a2');
-b.occupyCell('o', 'b2');
-b.occupyCell('x', 'a3');
-b.occupyCell('o', 'a1');
-b.occupyCell('x', 'c3');
-b.occupyCell('o', 'b3');
-b.occupyCell('x', 'b1');
-// b.occupyCell('o, 'b3');
-//b.occupyCell('o, 'c2');
+    hasOpenCell(){
+        let openCells = 0;
+        Object.keys(this._cells).forEach(cell => {
+            if(!this._cells[cell].occupiedBy){
+                openCells += 1
+            }
+        })
+        console.log('number of open cells', openCells)
+        return openCells !== 0
+    }
+}
 
 //T0DO: write position evaluation function
 
@@ -189,18 +189,6 @@ b.occupyCell('x', 'b1');
      }
     // the goal of this minimax function is for the computer AI to make a choice in a tic-tac-toe game
 
-     //check if all cells are occupied
-     let openCells = 0;
-     let lastCheckedCell = ''
-     Object.keys(boardCells).forEach(cell => {
-         if(!boardCells[cell].occupiedBy){
-             openCells += 1
-             lastCheckedCell = cell
-         }
-     })
-     if(openCells === 1){
-         return {val: 0, hasNoOpenCell: true, move: lastCheckedCell}
-     }
      //check for win in board
      const b = new Board();
      b.setCells(boardCells)
@@ -226,7 +214,6 @@ b.occupyCell('x', 'b1');
     Object.keys(boardCells).forEach(cell => {
         // we will now run minimax again for the unfilled cells - might delete this later so don't commit to it
          if (boardCells[cell].occupiedBy === null){
-             console.log('hey', depth)
              const minmax = minimax(alternate(playerID), {
                  ...boardCells,
                  [cell]: {occupiedBy: playerID}
@@ -264,8 +251,7 @@ b.occupyCell('x', 'b1');
 
 
  }
-
- console.log('result', minimax('o', b.cells(), 4, {}));
+ //console.log('result', minimax('o', b.cells(), 4, {}));
 
  export {
      Board,
