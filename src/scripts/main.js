@@ -189,6 +189,18 @@ b.occupyCell('x', 'b1');
      }
     // the goal of this minimax function is for the computer AI to make a choice in a tic-tac-toe game
 
+     //check if all cells are occupied
+     let openCells = 0;
+     let lastCheckedCell = ''
+     Object.keys(boardCells).forEach(cell => {
+         if(!boardCells[cell].occupiedBy){
+             openCells += 1
+             lastCheckedCell = cell
+         }
+     })
+     if(openCells === 1){
+         return {val: 0, hasNoOpenCell: true, move: lastCheckedCell}
+     }
      //check for win in board
      const b = new Board();
      b.setCells(boardCells)

@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class = 'flex justify-center mt-10'>
     <Game />
   </div>
