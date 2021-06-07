@@ -1,28 +1,30 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class = 'flex justify-center mt-10'>
+    <Game />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+//Use:
+/*
+This component will serve as something like an App component.
+Users will be able to start new game from here
+Maybe create another component for keeping track of a particular game's stats like Board instance,
+players, play mode(AI vs AI, AI vs Human or Human vs AI).
 
+*/
+import Game from './components/Game';
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    Game
+  },
+  data(){
+    return {}
+  },
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+
 </style>
