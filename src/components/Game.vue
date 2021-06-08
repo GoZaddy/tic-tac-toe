@@ -34,7 +34,7 @@
     </div>
     <Board
         :board="board"
-        :game-data="{currentTurn, players, gameState}"
+        :game-data="gameData"
         @move-played="onMovePlayed"
     />
     <div v-if="gameState === 'done'" class="mt-5">
@@ -124,13 +124,7 @@ export default {
 
       }
       else {
-        const player = data.split('-')[0]
-        if(player === 'x'){
-          this.currentTurn = 'o'
-        }
-        else {
-          this.currentTurn = 'x'
-        }
+        this.gameState = 'done'
       }
       console.log('move recorded')
 
@@ -139,12 +133,13 @@ export default {
   },
   watch: {
     currentTurn(){
-      if(this.currentTurn === this.players['computer']){
+      if(this.currentTurn && this.currentTurn === this.players['computer']){
         console.log('computer playing')
+        console.log('current Turn', this.currentTurn)
         //simulate wait time for computer to make decision
         setTimeout(() => {
           try{
-            const {move} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 4, {});
+            const {move} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 6, {});
             this.board.occupyCell(this.players['computer'], move)
             this.moves.push(this.players.computer+ '-'+move);
             const gameState = this.board.evaluateGameState();
@@ -167,8 +162,13 @@ export default {
           }
 
 
-        }, 1000)
+        }, 500)
       }
+    }
+  },
+  computed: {
+    gameData(){
+      return {currentTurn: this.currentTurn, players: this.players, gameState: this.gameState}
     }
   }
 }

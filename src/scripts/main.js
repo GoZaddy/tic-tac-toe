@@ -197,7 +197,7 @@ class Board {
      if (gameState === Number.POSITIVE_INFINITY || gameState === Number.NEGATIVE_INFINITY){
          return {val: gameState}
      }
-    if (depth === 0){
+    if (depth === 0 || !b.hasOpenCell()){
         const b = new Board();
         b.setCells(boardCells)
         //console.log(b.cells())
@@ -205,22 +205,29 @@ class Board {
         if (gameState === undefined){
             //console.log('is here o')
         }
+
+        //this is synonymous to reaching rhe leaf nodes and giving them values using the heuristic function
         return {val: gameState}
     }
 
     const res = {}
     const res1 = [];
-    //let count = 0
     Object.keys(boardCells).forEach(cell => {
         // we will now run minimax again for the unfilled cells - might delete this later so don't commit to it
          if (boardCells[cell].occupiedBy === null){
-             const minmax = minimax(alternate(playerID), {
-                 ...boardCells,
-                 [cell]: {occupiedBy: playerID}
-             }, depth - 1, {
-                 move: playerID.toString() + ' plays ' + cell
-             })
+             const minmax = minimax(
+                 alternate(playerID),
+                 {
+                     ...boardCells,
+                     [cell]: {...boardCells[cell], occupiedBy: playerID}
+                 },
+                 depth - 1,
+                 {
+                    move: playerID.toString() + ' plays ' + cell
+                 }
+             )
 
+             // this might be a fatal error because we can't assign scores based on just one cell. A final score is the result of different plays. Right? Actually no, since minimax only helps us minimise loss and maximise win and not predict opponent's actual moves
              res[minmax.val] = cell;
              res1.push({
                  [cell]: minmax.val
