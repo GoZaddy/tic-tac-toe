@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width:95%;max-width:400px">
 <!--    -->
     <div class="my-2" v-if="!newGameClicked">
       <button
@@ -34,12 +34,19 @@
     </div>
     <Board
         :board="board"
-        :game-data="{currentTurn, players}"
+        :game-data="gameData"
         @move-played="onMovePlayed"
     />
+    <div v-if="gameState === 'done'" class="mt-5">
+      <h2 class="px-2 font-bold">Moves played:</h2>
+      <div class="flex flex-wrap xs:max-w-11/12 md:max-w-full">
+        <p class="text-center text-md uppercase" v-html="moves.join(`<span class='text-pink-400'>&nbsp;&rarr;&nbsp;</span>`)"></p>
+      </div>
+
+    </div>
   </div>
 
-  
+
 </template>
 
 <script>
@@ -61,6 +68,7 @@ export default {
         'computer': ''
       },
       currentTurn: '',
+      gameState: 'uninitialized', //uninitialized, started, finished
       // for recording moves e.g x-a1, o-a2
       moves: []
     }
@@ -78,6 +86,7 @@ export default {
       };
       this.currentTurn = '';
       this.moves = [];
+      this.gameState = 'uninitialized';
       this.board = new BoardEntity()
     },
     onHumanSelect(player){
@@ -90,36 +99,76 @@ export default {
       }
       this.currentTurn = 'x'
       this.newGameClicked = false;
+      this.gameState = 'started'
     },
 
     onMovePlayed(data){
       this.moves.push(data)
-      console.log('move recorded')
-      const player = data.split('-')[0]
-      if(player === 'x'){
-        this.currentTurn = 'o'
-      } else {
-        this.currentTurn = 'x'
+      const gameState = this.board.evaluateGameState();
+      console.log('gameState', gameState)
+
+      //just checking if there are open cells
+      if(gameState !== Number.POSITIVE_INFINITY && gameState !== Number.NEGATIVE_INFINITY){
+        if (!this.board.hasOpenCell()){
+          console.log('bullshit')
+          this.gameState = 'done'
+        } else {
+            const player = data.split('-')[0]
+            if(player === 'x'){
+              this.currentTurn = 'o'
+            }
+            else {
+              this.currentTurn = 'x'
+            }
+        }
+
       }
-      console.log(this.moves)
+      else {
+        this.gameState = 'done'
+      }
+      console.log('move recorded')
+
+
     }
   },
   watch: {
     currentTurn(){
-      if(this.currentTurn === this.players['computer']){
+      if(this.currentTurn && this.currentTurn === this.players['computer']){
+        console.log('computer playing')
+        console.log('current Turn', this.currentTurn)
         //simulate wait time for computer to make decision
         setTimeout(() => {
-          const {move} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 4, {});
-          this.board.occupyCell(this.players['computer'], move)
-          this.moves.push(this.players.computer+ '-'+move);
-          const gameState = this.board.evaluateGameState()
-          console.log('gameState', gameState)
-          if(gameState !== Number.POSITIVE_INFINITY && gameState !== Number.NEGATIVE_INFINITY){
-            console.log('cells state', this.board.cells());
-            this.currentTurn = this.players['human'];
+          try{
+            const {move} = minimax(this.players['computer'], JSON.parse(JSON.stringify(this.board.cells())), 6, {});
+            this.board.occupyCell(this.players['computer'], move)
+            this.moves.push(this.players.computer+ '-'+move);
+            const gameState = this.board.evaluateGameState();
+            console.log('gameState', gameState)
+            if(gameState !== Number.POSITIVE_INFINITY && gameState !== Number.NEGATIVE_INFINITY){
+              if (!this.board.hasOpenCell()){
+                console.log('bullshit')
+                this.gameState = 'done'
+              } else {
+                console.log('cells state', this.board.cells());
+                this.currentTurn = this.players['human'];
+              }
+
+            } else {
+              console.log('game done')
+              this.gameState = 'done'
+            }
+          } catch (e) {
+            console.log('error', e)
           }
-        }, 1000)
+
+
+        }, 500)
       }
+    }
+  },
+  computed: {
+    gameData(){
+      return {currentTurn: this.currentTurn, players: this.players, gameState: this.gameState}
     }
   }
 }
